@@ -1,0 +1,14 @@
+.button {
+    font-size: 1rem;
+    width: 7rem;
+    padding: .7rem;
+    border-radius: .5rem;
+    background-color: rgb(18, 18, 18);
+    border: 1px solid rgb(18, 18, 18);
+    transition: all .3s;
+}
+
+.button:hover {
+    border: 1px solid #64ec83;
+    cursor: pointer;
+}

@@ -1,0 +1,12 @@
+div {
+    display: flex;
+    gap: 3rem;
+}
+
+span {
+    min-height: 30px;
+}
+
+h1 {
+    color: #64ec83;
+}
