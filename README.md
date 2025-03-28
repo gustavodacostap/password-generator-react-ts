@@ -1,54 +1,24 @@
-# React + TypeScript + Vite
+# Gerador de Senhas - React + TypeScript
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é o meu primeiro projeto utilizando **React** e **TypeScript**. O objetivo deste projeto é criar um gerador de senhas aleatórias que também permite copiá-las para a área de transferência com um clique.
 
-Currently, two official plugins are available:
+## Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Gerar Senha**: Clica no botão "Gerar!" e uma nova senha aleatória é gerada.
+- **Copiar Senha**: Clica no botão "Copiar" para copiar a senha gerada para a área de transferência. O texto do botão muda para "Copiado!" por 2,5 segundos para indicar que a senha foi copiada.
 
-## Expanding the ESLint configuration
+## Tecnologias Utilizadas
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React**: Biblioteca para construção de interfaces de usuário.
+- **TypeScript**: Superset do JavaScript que adiciona tipagem estática ao código.
+- **CSS Modules**: Estilização modular e isolada para os componentes.
+- **useState e useCallback**: Hooks do React para gerenciar estado e otimizar funções.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Observações
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Este é um projeto simples, mas ele ajudou a entender como utilizar React e TypeScript em conjunto.
+- O código foi otimizado com o uso do hook useCallback para memorizar funções e melhorar a performance, além de useState para gerenciar o estado da senha gerada e do texto dos botões.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Contribuições
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+Se você quiser contribuir para este projeto, fique à vontade para fazer um fork e enviar pull requests. Qualquer sugestão de melhoria é bem-vinda!
