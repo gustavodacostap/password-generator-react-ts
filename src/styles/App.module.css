@@ -50,7 +50,7 @@ span {
   transition: border 0.2s;
 }
 
-/* Caixa de opções */
+/* Caixa de personalização */
 .optionsBox {
   display: flex;
   flex-direction: column;
