@@ -1,51 +1,177 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Container from "./components/Container.tsx";
+import Toast from "./components/Toast";
 import containerStyles from "./styles/Container.module.css";
-import Button from "./components/Button.tsx";
 import appStyles from "./styles/App.module.css";
-
-type ButtonText = 'Copiar' | 'Copiado!';
+import { FaCopy } from "react-icons/fa";
+import { FiRefreshCcw } from "react-icons/fi";
 
 export default function App() {
-  // Estado para o texto do botão "Copiar"
-  const [copyButtonText, setCopyButtonText] = useState<ButtonText>('Copiar');
-  // Estado para armazenar a senha gerada
-  const [password, setPassword] = useState<string>('');
+  const [password, setPassword] = useState<string>("");
+  const [length, setLength] = useState<number>(12);
+  const [tempLength, setTempLength] = useState<string>(String(length))
+  const [showToast, setShowToast] = useState(false);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Função para gerar a senha aleatória
+  const handleGeneratePassword = () => {
+    // Fecha o toast se estiver visível
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+    }
+    setShowToast(false);
+
+    // Gera nova senha
+    generatePassword();
+  };
+
+  // Gera senha com base no comprimento atual
   const generatePassword = useCallback(() => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?";
-    const length = 14;
-    let newPassword = '';
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?";
+    let newPassword = "";
 
     for (let i = 0; i < length; i++) {
       const randomIndex = Math.floor(Math.random() * chars.length);
       newPassword += chars[randomIndex];
     }
 
-    // Atualiza o estado com a nova senha gerada
     setPassword(newPassword);
-  }, []); // Apenas cria a função uma vez, pois não depende de nenhum valor externo
+  }, [length]);
 
-  // Função para copiar a senha gerada para a área de transferência
+  // Copia a senha para a área de transferência
   const copyPassword = useCallback(async () => {
     if (password) {
       await navigator.clipboard.writeText(password);
-      setCopyButtonText('Copiado!');
-      // Retorna o texto do botão para "Copiar" após 1.5 segundos
-      setTimeout(() => setCopyButtonText('Copiar'), 1500);
+
+      // Se já tiver um toast ativo, cancela ele
+      if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+      setShowToast(false);
+
+        // Aguarda um pequeno delay para o React renderizar o fechamento e reabrir o toast
+        setTimeout(() => {
+          setShowToast(true);
+          toastTimeoutRef.current = setTimeout(() => {
+            setShowToast(false);
+            toastTimeoutRef.current = null;
+          }, 2800);
+        }, 50); // delay pequeno só para garantir que o componente re-renderize corretamente
+      } else {
+        // Caso não tenha toast aberto
+        setShowToast(true);
+        toastTimeoutRef.current = setTimeout(() => {
+          setShowToast(false);
+          toastTimeoutRef.current = null;
+        }, 2800);
+      }
     }
-  }, [password]); 
+  }, [password]);
+
+  // Gera senha na primeira renderização
+  useEffect(() => {
+    generatePassword();
+  }, []);
+
+  // Gera senha automaticamente quando o comprimento muda
+  useEffect(() => {
+    generatePassword();
+    setTempLength(String(length))
+
+    // Fecha o toast se estiver visível
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+    }
+    setShowToast(false);
+  }, [length, generatePassword]);
+
+  // Atualiza o estado length (com validação) e sincroniza o tempLength
+  const applyLengthChange = (value: number) => {
+    const validatedLength = Math.max(1, Math.min(50, value));
+    setLength(validatedLength);
+    setTempLength(String(validatedLength));
+  };
+
+    const handleCloseToast = () => {
+    setShowToast(false);
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+      toastTimeoutRef.current = null;
+    }
+  };
 
   return (
-    <Container className={containerStyles.container}>
-      <h1 className={appStyles.h1}>Gerador de senhas</h1>
-      <div className={appStyles.div}>
-        <Button onClick={generatePassword}>Gerar!</Button>
-        <Button onClick={copyPassword}>{copyButtonText}</Button>
-      </div>
-      {/* Exibe a senha gerada */}
-      <span className={appStyles.span}>{password}</span>
-    </Container>
+    <>
+      <Container className={containerStyles.container}>
+        <h1 className={appStyles.h1}>Gerador de senhas</h1>
+
+        {/* Caixa da senha */}
+        <div className={appStyles.passwordBox}>
+          <span className={appStyles.passwordText}>
+            {password || "Sua senha aparecerá aqui"}
+          </span>
+          <div className={appStyles.iconButtons}>
+            <button
+              onClick={handleGeneratePassword}
+              title="Gerar senha"
+              className={appStyles.iconButton}
+            >
+              <FiRefreshCcw />
+            </button>
+            <button
+              onClick={copyPassword}
+              className={appStyles.iconButton}
+            >
+              <FaCopy />
+            </button>
+          </div>
+        </div>
+
+        {/* Personalização */}
+        <div className={appStyles.optionsBox}>
+          <h2>Personalize sua senha</h2>
+          <hr />
+          <label htmlFor="length">Número de caracteres da senha</label>
+          <div className={appStyles.rangeContainer}>
+            <input
+              type="number"
+              min={1}
+              max={50}
+              value={tempLength}
+              onChange={(e) => {
+                setTempLength(e.target.value); // permite apagar input, vazio etc
+              }}
+              onBlur={() => {
+                // Ao perder foco, valida e aplica o valor
+                if (tempLength === "" || isNaN(Number(tempLength))) {
+                  applyLengthChange(12); // padrão 12
+                } else {
+                  applyLengthChange(Number(tempLength));
+                }
+              }}
+              className={appStyles.numberInput}
+            />
+            <input
+              id="length"
+              type="range"
+              min={1}
+              max={50}
+              value={length}
+              onChange={(e) => applyLengthChange(Number(e.target.value))}
+            />
+          </div>
+        </div>
+      </Container>
+
+      {/* Toast */}
+      {showToast && (
+        <Toast
+          message="Texto copiado!"
+          onClose={handleCloseToast}
+        />
+      )}
+    </>
   );
 }

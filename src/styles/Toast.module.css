@@ -1,0 +1,51 @@
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background-color: #525252;
+  color: #0a0a0a;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  z-index: 1000;
+  min-width: 200px;
+  max-width: 90vw;
+  animation: fadeIn 0.3s ease forwards, fadeOut 0.3s ease forwards;
+  animation-delay: 0s, 2.5s;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #0a0a0a;
+  line-height: 1;
+  padding: 0;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes fadeOut {
+    from {opacity: 1; transform: translateY(0);}
+    to {opacity: 0; transform: translateY(10px);}
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+  .toast {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+    min-width: 150px;
+  }
+}
