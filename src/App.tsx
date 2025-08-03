@@ -8,7 +8,7 @@ import { FiRefreshCcw } from "react-icons/fi";
 export default function App() {
   const [password, setPassword] = useState("");
   const [length, setLength] = useState(12);
-    // Valor temporário do input numérico (permite digitação livre)
+  // Valor temporário do input numérico (permite digitação livre)
   const [tempLength, setTempLength] = useState(String(length));
   const [showToast, setShowToast] = useState(false);
 
@@ -103,11 +103,10 @@ export default function App() {
 
         {/* Caixa de exibição da senha e botões de ação */}
         <div className={appStyles.passwordBox}>
-          <span className={appStyles.passwordText}>
-            {password}
-          </span>
+          <span className={appStyles.passwordText}>{password}</span>
           <div className={appStyles.iconButtons}>
             <button
+              type="button"
               onClick={generatePassword}
               title="Gerar nova senha"
               className={appStyles.iconButton}
@@ -115,6 +114,7 @@ export default function App() {
               <FiRefreshCcw />
             </button>
             <button
+              type="button"
               onClick={copyPassword}
               title="Copiar senha"
               className={appStyles.iconButton}
@@ -128,7 +128,7 @@ export default function App() {
         <div className={appStyles.optionsBox}>
           <h2>Escolha o tamanho</h2>
           <hr />
-          <label htmlFor="length">Número de caracteres da senha</label>
+          <span id="range-label">Número de caracteres da senha</span>
           <div className={appStyles.rangeContainer}>
             {/* Input numérico controlado por tempLength */}
             <input
@@ -136,6 +136,7 @@ export default function App() {
               min={1}
               max={50}
               maxLength={2}
+              aria-labelledby="range-label"
               value={tempLength}
               onChange={(e) => {
                 const value = e.target.value;
@@ -154,6 +155,7 @@ export default function App() {
               type="range"
               min={1}
               max={50}
+              aria-labelledby="range-label"
               value={length}
               onChange={(e) => updateLength(Number(e.target.value))}
             />
