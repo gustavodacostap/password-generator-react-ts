@@ -11,6 +11,10 @@ export default function App() {
   // Valor temporário do input numérico (permite digitação livre)
   const [tempLength, setTempLength] = useState(String(length));
   const [showToast, setShowToast] = useState(false);
+  const [uppercase, setUppercase] = useState(true);
+  const [lowercase, setLowercase] = useState(true);
+  const [numbers, setNumbers] = useState(true);
+  const [symbols, setSymbols] = useState(true);
 
   // Referência para o timeout do toast (permite limpar antes de mostrar outro)
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -78,11 +82,15 @@ export default function App() {
   /** Aplica o valor digitado no input quando o campo perde o foco */
   const handleBlurTempLength = () => {
     const numeric = Number(tempLength);
-    if (!tempLength || isNaN(numeric)) {
-      updateLength(12);
-    } else {
-      updateLength(numeric);
+
+    if (numeric !== length) {
+      updateLength(!tempLength || isNaN(numeric) ? 12 : numeric);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleBlurTempLength();
   };
 
   // Gera uma senha inicial ao montar o componente
@@ -99,68 +107,108 @@ export default function App() {
   return (
     <>
       <Container>
-        <h1 className={appStyles.h1}>Gerador de senhas</h1>
+        <form onSubmit={handleSubmit}>
+          <h1 className={appStyles.h1}>Gerador de senhas</h1>
 
-        {/* Caixa de exibição da senha e botões de ação */}
-        <div className={appStyles.passwordBox}>
-          <span className={appStyles.passwordText}>{password}</span>
-          <div className={appStyles.iconButtons}>
-            <button
-              type="button"
-              onClick={generatePassword}
-              title="Gerar nova senha"
-              className={appStyles.iconButton}
-            >
-              <FiRefreshCcw />
-            </button>
-            <button
-              type="button"
-              onClick={copyPassword}
-              title="Copiar senha"
-              className={appStyles.iconButton}
-            >
-              <FaCopy />
-            </button>
+          {/* Caixa de exibição da senha e botões de ação */}
+          <div className={appStyles.passwordBox}>
+            <span className={appStyles.passwordText}>{password}</span>
+            <div className={appStyles.iconButtons}>
+              <button
+                type="button"
+                onClick={generatePassword}
+                title="Gerar nova senha"
+                className={appStyles.iconButton}
+              >
+                <FiRefreshCcw />
+              </button>
+              <button
+                type="button"
+                onClick={copyPassword}
+                title="Copiar senha"
+                className={appStyles.iconButton}
+              >
+                <FaCopy />
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Personalização */}
-        <div className={appStyles.optionsBox}>
-          <h2>Escolha o tamanho</h2>
-          <hr />
-          <span id="range-label">Número de caracteres da senha</span>
-          <div className={appStyles.rangeContainer}>
-            {/* Input numérico controlado por tempLength */}
-            <input
-              type="number"
-              min={1}
-              max={50}
-              maxLength={2}
-              aria-labelledby="range-label"
-              value={tempLength}
-              onChange={(e) => {
-                const value = e.target.value;
-                // Permite vazio ou até dois dígitos
-                if (value === "" || /^[0-9]{1,2}$/.test(value)) {
-                  setTempLength(value);
-                }
-              }}
-              onBlur={handleBlurTempLength}
-              className={appStyles.numberInput}
-            />
+          {/* Personalização */}
+          <div className={appStyles.optionsBox}>
+            <h2>Escolha o tamanho</h2>
+            <hr />
+            <span id="range-label">Número de caracteres da senha</span>
+            <div className={appStyles.rangeContainer}>
+              {/* Input numérico controlado por tempLength */}
+              <input
+                type="number"
+                min={1}
+                max={50}
+                maxLength={2}
+                aria-labelledby="range-label"
+                value={tempLength}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Permite vazio ou até dois dígitos
+                  if (value === "" || /^[0-9]{1,2}$/.test(value)) {
+                    setTempLength(value);
+                  }
+                }}
+                onBlur={handleBlurTempLength}
+                className={appStyles.numberInput}
+              />
 
-            {/* Input deslizante que altera diretamente o length */}
-            <input
-              id="length"
-              type="range"
-              min={1}
-              max={50}
-              aria-labelledby="range-label"
-              value={length}
-              onChange={(e) => updateLength(Number(e.target.value))}
-            />
+              {/* Input deslizante que altera diretamente o length */}
+              <input
+                id="length"
+                type="range"
+                min={1}
+                max={50}
+                aria-labelledby="range-label"
+                value={length}
+                onChange={(e) => updateLength(Number(e.target.value))}
+              />
+            </div>
+            <div>
+              <div>
+                <input
+                  type="checkbox"
+                  name="uppercase"
+                  id="uppercase"
+                  checked={uppercase}
+                />
+                <label htmlFor="uppercase">Maiúsculo</label>
+              </div>
+              <div>
+                <input
+                  type="checkbox"
+                  name="lowercase"
+                  id="lowercase"
+                  checked={lowercase}
+                />
+                <label htmlFor="lowercase">Minúsculo</label>
+              </div>
+              <div>
+                <input
+                  type="checkbox"
+                  name="number"
+                  id="number"
+                  checked={numbers}
+                />
+                <label htmlFor="number">Números</label>
+              </div>
+              <div>
+                <input
+                  type="checkbox"
+                  name="symbols"
+                  id="symbols"
+                  checked={symbols}
+                />
+                <label htmlFor="symbols">Símbolos</label>
+              </div>
+            </div>
           </div>
-        </div>
+        </form>
       </Container>
 
       {/* Toast de feedback ao copiar */}
