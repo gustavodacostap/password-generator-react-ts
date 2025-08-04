@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import Container from "./components/Container";
 import Toast from "./components/Toast";
 import appStyles from "./styles/App.module.css";
+import checkboxStyles from "./styles/Checkbox.module.css";
 import { FaCopy } from "react-icons/fa";
 import { FiRefreshCcw } from "react-icons/fi";
 
@@ -11,18 +12,37 @@ export default function App() {
   // Valor temporário do input numérico (permite digitação livre)
   const [tempLength, setTempLength] = useState(String(length));
   const [showToast, setShowToast] = useState(false);
-  const [uppercase, setUppercase] = useState(true);
-  const [lowercase, setLowercase] = useState(true);
-  const [numbers, setNumbers] = useState(true);
-  const [symbols, setSymbols] = useState(true);
+  const [options, setOptions] = useState({
+    uppercase: true,
+    lowercase: true,
+    numbers: true,
+    symbols: true,
+  });
+
+  const optionLabels: Record<keyof typeof options, string> = {
+    uppercase: "Maiúsculo",
+    lowercase: "Minúsculo",
+    numbers: "Números",
+    symbols: "Símbolos",
+  };
 
   // Referência para o timeout do toast (permite limpar antes de mostrar outro)
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /** Gera uma nova senha baseada no comprimento */
   const generatePassword = useCallback(() => {
-    const charset =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=<>?";
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const symbols = "!@#$%^&*()_-+=<>?";
+
+    let charset = "";
+
+    if (options.uppercase) charset += uppercase;
+    if (options.lowercase) charset += lowercase;
+    if (options.numbers) charset += numbers;
+    if (options.symbols) charset += symbols;
+
     const newPassword = Array.from({ length }, () =>
       charset.charAt(Math.floor(Math.random() * charset.length))
     ).join("");
@@ -36,7 +56,13 @@ export default function App() {
 
     // Atualiza o estado da nova senha
     setPassword(newPassword);
-  }, [length]);
+  }, [
+    length,
+    options.uppercase,
+    options.lowercase,
+    options.numbers,
+    options.symbols,
+  ]);
 
   /** Exibe o toast de "Texto copiado!" garantindo que apenas um esteja ativo */
   const showCopyToast = useCallback(() => {
@@ -93,16 +119,28 @@ export default function App() {
     handleBlurTempLength();
   };
 
+  const handleOptionChange = (key: keyof typeof options, checked: boolean) => {
+    const activeCount = Object.values(options).filter(Boolean).length;
+
+    if (!checked && activeCount === 1) {
+      generatePassword();
+      return;
+    }
+
+    setOptions({ ...options, [key]: checked });
+    generatePassword();
+  };
+
   // Gera uma senha inicial ao montar o componente
   useEffect(() => {
     generatePassword();
-  }, []);
+  }, [generatePassword]);
 
   // Gera nova senha automaticamente sempre que `length` for alterado
   useEffect(() => {
     generatePassword();
     handleCloseToast();
-  }, [length]);
+  }, [length, generatePassword]);
 
   return (
     <>
@@ -135,7 +173,7 @@ export default function App() {
 
           {/* Personalização */}
           <div className={appStyles.optionsBox}>
-            <h2>Escolha o tamanho</h2>
+            <h2>Personalize sua senha</h2>
             <hr />
             <span id="range-label">Número de caracteres da senha</span>
             <div className={appStyles.rangeContainer}>
@@ -169,43 +207,21 @@ export default function App() {
                 onChange={(e) => updateLength(Number(e.target.value))}
               />
             </div>
-            <div>
-              <div>
-                <input
-                  type="checkbox"
-                  name="uppercase"
-                  id="uppercase"
-                  checked={uppercase}
-                />
-                <label htmlFor="uppercase">Maiúsculo</label>
-              </div>
-              <div>
-                <input
-                  type="checkbox"
-                  name="lowercase"
-                  id="lowercase"
-                  checked={lowercase}
-                />
-                <label htmlFor="lowercase">Minúsculo</label>
-              </div>
-              <div>
-                <input
-                  type="checkbox"
-                  name="number"
-                  id="number"
-                  checked={numbers}
-                />
-                <label htmlFor="number">Números</label>
-              </div>
-              <div>
-                <input
-                  type="checkbox"
-                  name="symbols"
-                  id="symbols"
-                  checked={symbols}
-                />
-                <label htmlFor="symbols">Símbolos</label>
-              </div>
+            <div className={checkboxStyles.checkboxContainer}>
+              {(Object.keys(options) as (keyof typeof options)[]).map((key) => (
+                <div key={key} className={checkboxStyles.checkboxGroup}>
+                  <input
+                    type="checkbox"
+                    id={key}
+                    checked={options[key]}
+                    onChange={(e) => handleOptionChange(key, e.target.checked)}
+                    className={checkboxStyles.checkbox}
+                  />
+                  <label htmlFor={key} className={checkboxStyles.label}>
+                    {optionLabels[key]}
+                  </label>
+                </div>
+              ))}
             </div>
           </div>
         </form>

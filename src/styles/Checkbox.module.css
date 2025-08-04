@@ -1,0 +1,21 @@
+.checkboxContainer {
+  margin-top: 1.5rem;
+}
+
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+
+  cursor: pointer;
+}
+
+.checkbox:checked {
+  accent-color: #64ec83;
+}
